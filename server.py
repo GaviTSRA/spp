@@ -40,4 +40,4 @@ def upload():
       return send_file("./project.sb3")
    else: return "Invalid method"
  
-app.run(port=int(os.getenv("PORT", 5000)))
+app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
