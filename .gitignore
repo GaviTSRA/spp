@@ -1,0 +1,5 @@
+__pycache__
+compiler/__pycache__
+project.sb3
+project.spp
+.env
