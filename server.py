@@ -1,4 +1,3 @@
-from re import M
 from flask import Flask,request,send_file
 import dotenv
 import os
@@ -41,4 +40,4 @@ def upload():
       return send_file("./project.sb3")
    else: return "Invalid method"
  
-app.run(host='localhost', port=5000)
+app.run(port=os.getenv("port"))
