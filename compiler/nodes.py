@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-
 @dataclass
 class InstrNode:
     value: str
@@ -65,3 +64,28 @@ class FileNode:
         for block in self.blocks:
             res += f"{block}\n"
             return res
+
+@dataclass
+class IfNode:
+    condition: ExprNode
+    body: BodyNode
+    previous: int = None
+    index: int = None
+    next: int = None
+
+    def __repr__(self) -> str:
+        return f"{self.body}"
+
+@dataclass
+class BooleanNode:
+    value: str
+
+    def __repr__(self) -> str:
+        return f"{self.body}"
+
+@dataclass
+class VariableNode:
+    value: str
+
+    def __repr__(self) -> str:
+        return f"{self.body}"

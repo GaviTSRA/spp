@@ -58,4 +58,6 @@ def run(codefile, projectfile, useSpinners):
     if useSpinners: spinner.stop()
 
 if __name__ == "__main__":
-    run(sys.argv[1], sys.argv[2])
+    run(sys.argv[1], sys.argv[2], True)
+
+#TODO Compiler fails if no nodes are present in the original project

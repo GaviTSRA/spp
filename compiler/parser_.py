@@ -79,19 +79,23 @@ class Parser:
         return BodyNode(res)
 
     def expr(self):
-        res = self.instr()
-        
-        self.require([TokenType.STRING, TokenType.NUMBER, TokenType.SEMICOL], "Expected value or ';'")
-
-        if self.current_token.type == TokenType.SEMICOL:
+        if self.current_token.value == "if":
             self.advance()
-            return ExprNode(res)
+            return self.ifNode()
         else:
-            val = self.current_token.value
-            self.advance()
-            self.require([TokenType.SEMICOL], "Expected ';'")
-            self.advance()
-            return ExprNode(res, val, self.index - 1, self.index, self.index + 1 )
+            res = self.instr()
+            
+            self.require([TokenType.STRING, TokenType.NUMBER, TokenType.SEMICOL], "Expected value or ';'")
+
+            if self.current_token.type == TokenType.SEMICOL:
+                self.advance()
+                return ExprNode(res)
+            else:
+                val = self.current_token.value
+                self.advance()
+                self.require([TokenType.SEMICOL], "Expected ';'")
+                self.advance()
+                return ExprNode(res, val, self.index - 1, self.index, self.index + 1 )
 
     def instr(self):
         self.require([TokenType.BUILD_IN], "Expected instruction")
@@ -99,3 +103,33 @@ class Parser:
         self.advance()
 
         return res
+
+    def ifNode(self):
+        self.require([TokenType.BUILD_IN], "Expected condition")
+        condition = self.bool()
+
+        self.require([TokenType.LCPAREN], "Expected '{' (start of 'if' body)")
+        self.advance()
+
+        res = []
+
+        while self.current_token.type in [TokenType.BUILD_IN]:
+            res.append(self.expr())
+            self.index += 1
+
+        self.require([TokenType.RCPAREN], "Expected '}'")
+        self.advance()
+
+        return IfNode(condition, BodyNode(res), self.index - 1, self.index, self.index + 1)
+
+    def bool(self):
+        self.require([TokenType.STRING])
+        node = BooleanNode(self.current_token.value)
+        self.advance()
+        return node
+
+    def var(self):
+        self.require([TokenType.STRING, TokenType.NUMBER])
+        node = VariableNode(self.current_token.value)
+        self.advance()
+        return node

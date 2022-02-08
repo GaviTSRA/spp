@@ -9,10 +9,15 @@ NODES = {
     "move": "motion_movesteps",
     "rturn": "motion_turnright",
     "lturn": "motion_turnleft",
+    "setx": "motion_setx",
+    "sety": "motion_sety",
+    "changex": "motion_changexby",
+    "changey": "motion_changeyby",
     # START LOOKS
     # START SOUND
     # START EVENTS
     # START CONTROL
+    "wait": "control_wait",
     # START SENSING
     # START OPERATORS
     # START VARIABLES
@@ -30,20 +35,49 @@ UNSUPPORTED_NODES = {
     "glidexy": "motion_glidetoxy",
     "point": "motion_point_in_direction",
     "pointto": "motion_pointtowardsmotion_pointtowards", #motion_pointtowards_menu
-    "changex": "motion_changexby",
-    "setx": "motion_setx",
-    "changey": "motion_changeyby",
-    "sety": "motion_sety",
     "edgebounce": "motion_ifonedgebounce",
-    "rotstyle": "motion_setrotationstyle"
+    "rotstyle": "motion_setrotationstyle",
     # START LOOKS
-    #TODO
+    "say_for": "looks_sayforsecs",
+    "say": "looks_say",
+    "think_for": "looks_thinkforsecs",
+    "think": "looks_think",
+    "costume_switch_to": "looks_switchcostumeto",  #looks_costume
+    "next_costume": "looks_nextcostume",
+    "backdrop_switch_to": "looks_switchbackdropto", #looks_backdrops
+    "next_backdrop": "looks_nextbackdrop",
+    "change_size_by": "looks_changesizeby",
+    "set_size": "looks_setsizeto",
+    "change_effect_by": "looks_changeeffectby",
+    "set_effect": "looks_seteffectto",
+    "clear_effects": "looks_cleargraphiceffects",
+    "show": "looks_show",
+    "hide": "looks_hide",
+    "go_to_layer": "looks_gotofrontback",
+    "go_layers_forward": "looks_goforwardbackwardlayers",
     # START SOUND
-    #TODO
+    "play_sound_until_done": "sound_playuntildone", #sound_sounds_menu
+    "play_sound": "sound_play", #sound_sounds_menu
+    "stop_all_sounds": "sound_stopallsounds",
+    "change_effect_by": "sound_changeeffectby",
+    "set_effect": "sound_seteffectto",
+    "clear_effects": "sound_cleareffects",
+    "change_volume": "sound_changevolumeby",
+    "set_volume": "sound_setvolumeto",
     # START EVENTS
-    #TODO
+    "broadcast": "event_broadcast",
+    "broadcast_wait": "event_broadcastandwait",
     # START CONTROL
-    #TODO
+    "repeat": "control_repeat",
+    "forever": "control_forever",
+    "if": "control_if",
+    "ife": "control_if_else",
+    "wait_until": "control_wait_until",
+    "repeat_until": "control_repeat_until",
+    "stop": "control_stop",
+    "start_clone": "control_start_as_clone",
+    "create_clone": "control_create_clone_of", #control_create_clone_of_menu
+    "delete_clone": "control_delete_this_clone",
     # START SENSING
     #TODO
     # START OPERATORS
@@ -120,7 +154,49 @@ class Compiler:
             if node.value == None:
                 raise ValueError("turn instruction needs one value")
             result += f'"{node.value}"' + ']]},'
-        
+        elif node.instr.value.lower() in ["wait"]:
+            result += '"inputs": {"DURATION": [1,[5,'
+            if node.value == None:
+                raise ValueError("turn instruction needs one value")
+            result +=  f'"{node.value}"' + ']]},'
+        elif node.instr.value.lower() in ["setx"]:
+            result += '"inputs": {"X": [1,[4,'
+            if node.value == None:
+                raise ValueError("turn instruction needs one value")
+            result +=  f'"{node.value}"' + ']]},'
+        elif node.instr.value.lower() in ["sety"]:
+            result += '"inputs": {"Y": [1,[4,'
+            if node.value == None:
+                raise ValueError("turn instruction needs one value")
+            result +=  f'"{node.value}"' + ']]},'
+        elif node.instr.value.lower() in ["changex"]:
+            result += '"inputs": {"DX": [1,[4,'
+            if node.value == None:
+                raise ValueError("turn instruction needs one value")
+            result +=  f'"{node.value}"' + ']]},'
+        elif node.instr.value.lower() in ["changey"]:
+            result += '"inputs": {"DY": [1,[4,'
+            if node.value == None:
+                raise ValueError("turn instruction needs one value")
+            result +=  f'"{node.value}"' + ']]},'
+
         result += '"fields": {},"shadow": false,"topLevel": false}'
 
         self.res += result
+
+    def visit_IfNode(self, node):
+        result = ""
+
+        result += f',"{node.index}": ' + '{"opcode": "control_if","next": null,"parent": null,"inputs": {'
+        result += f'"CONDITION": [2,'
+        result += '"xdu%=xh(Ocq^JRS+]kK["' # TODO if conditions
+        result += '],"SUBSTACK": [2,'
+
+        for n in node.body.exprs:
+            result += f'"{n.index}",'
+        result = result[:-1]
+
+        result += ']},"fields": {},"shadow": false,"topLevel": false}'
+        
+        self.res += result
+        self.visit(node.body)
